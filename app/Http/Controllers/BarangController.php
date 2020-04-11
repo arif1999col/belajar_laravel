@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Barang;
+use DB;
 use Illuminate\Http\Request;
 
 class BarangController extends Controller
@@ -15,7 +16,8 @@ class BarangController extends Controller
     {
         //
         $title='Barang';
-        return view('admin.barang',compact('title'));
+        $barang=Barang::paginate(5);
+        return view('admin.barang',compact('title','barang'));
     }
 
     /**
@@ -25,7 +27,8 @@ class BarangController extends Controller
      */
     public function create()
     {
-        //
+        $title='Input Barang';
+        return view('admin.inputbarang',compact('title'));
     }
 
     /**
@@ -36,7 +39,18 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $messages = [
+            'requieed'=> 'Kolom: Huruf Harus lengkap',
+            'date'=>'Kolom Tanggal Harus Lengkap',
+            'numeric'=>'Kolom harus Nomor',
+        ];
+       $validasi = $request->validate([
+        'nama_barang' => 'required',
+        'jenis' => 'required',
+        'harga' => 'numeric'
+       ],$messages);
+        Barang::create($validasi);
+        return redirect('barang');
     }
 
     /**
@@ -58,7 +72,9 @@ class BarangController extends Controller
      */
     public function edit($id)
     {
-        //
+        $title='Input Barang';
+        $barang=Barang::find($id);
+        return view('admin.inputbarang',compact('title','barang'));
     }
 
     /**
@@ -70,7 +86,18 @@ class BarangController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $messages = [
+            'requieed'=> 'Kolom: Huruf Harus lengkap',
+            'date'=>'Kolom Tanggal Harus Lengkap',
+            'numeric'=>'Kolom harus Nomor',
+        ];
+       $validasi = $request->validate([
+        'nama_barang' => 'required',
+        'jenis' => 'required',
+        'harga' => 'numeric'
+       ],$messages);
+        Barang::where('kode_item',$id)->update($validasi);
+        return redirect('barang');
     }
 
     /**
@@ -81,6 +108,7 @@ class BarangController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Barang::where('kode_item',$id)->delete();
+        return redirect('barang')->with('success','Data Terhapus');
     }
 }
